@@ -11,99 +11,103 @@ import android.widget.Toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
 
 class Signup : AppCompatActivity() {
 
     private val apiService: Retrofit1 by lazy {
         RetrofitClient.apiService
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
-        val BASEURL="kk"
-        val emls=findViewById<EditText>(R.id.emlset)
-        val names=findViewById<EditText>(R.id.nameset)
-        val pwds=findViewById<EditText>(R.id.pwdset)
-        val net=findViewById<EditText>(R.id.numberet)
-        val bet=findViewById<EditText>(R.id.balanceet)
-        val sign=findViewById<ImageView>(R.id.signupybtn)
-        val alog=findViewById<Button>(R.id.loggedinbtn)
 
+        // Initialize UI components
+        val emailEditText = findViewById<EditText>(R.id.emlset)
+        val nameEditText = findViewById<EditText>(R.id.nameset)
+        val passwordEditText = findViewById<EditText>(R.id.pwdset)
+        val numberEditText = findViewById<EditText>(R.id.numberet)
+        val balanceEditText = findViewById<EditText>(R.id.balanceet)
+        val signupButton = findViewById<ImageView>(R.id.signupybtn)
+        val loginButton = findViewById<Button>(R.id.loggedinbtn)
 
-
-
-
-
-
-
-
-        alog.setOnClickListener {
-            val intent= Intent(this,Login::class.java)
-            startActivity(intent)
+        // Set login button click listener
+        loginButton.setOnClickListener {
+            navigateToLogin()
         }
 
-
-        sign.setOnClickListener {
-            val map: HashMap<String, String> = HashMap()
-            map["username"] = names.text.toString()
-            map["email"] = emls.text.toString()
-            map["password"] = pwds.text.toString()
-            map["number"]=net.text.toString()
-            map["balance"]=bet.text.toString()
-            Log.d("MAP", "$map")
-
-
-            val registerUserCall = apiService.registerUser(map)
-
-            registerUserCall.enqueue(object : Callback<RegisterUserResponse> {
-                override fun onResponse(
-                    call: Call<RegisterUserResponse>,
-                    response: Response<RegisterUserResponse>
-                ) {
-                    Log.d("MAP2", "$map")
-                    Log.d("res", "$response")
-
-                    if (response.isSuccessful) {
-                        val getUserByNameResponse = response.body()
-                        if (getUserByNameResponse != null) {
-                            val name =
-                                getUserByNameResponse.name
-                            // Get the user's name from the response
-                            //val numb=getUserByNameResponse.number
-                            //val registerUserResponse = response.body()
-                            Toast.makeText(
-                                this@Signup,
-                                "Signed up successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            val intent = Intent(this@Signup, HomeActivityPage::class.java)
-                            intent.putExtra("user_name", name)
-                            startActivity(intent)
-                            // Handle successful registration
-                        } else if (response.code() == 404) {
-                            Toast.makeText(
-                                this@Signup,
-                                "ALREADY REGISTERED",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-
-                            // Handle registration error
-                        }
-                    }
-
-
-                }
-
-                override fun onFailure(call: Call<RegisterUserResponse>, t: Throwable) {
-                    Toast.makeText(this@Signup, t.message, Toast.LENGTH_SHORT).show()
-                }
-            })
-
+        // Set signup button click listener
+        signupButton.setOnClickListener {
+            val userMap = collectUserData(
+                emailEditText,
+                nameEditText,
+                passwordEditText,
+                numberEditText,
+                balanceEditText
+            )
+            Log.d("User Data", "$userMap")
+            registerUser(userMap)
         }
+    }
 
+    private fun navigateToLogin() {
+        val intent = Intent(this, Login::class.java)
+        startActivity(intent)
+    }
 
+    private fun collectUserData(
+        emailEditText: EditText,
+        nameEditText: EditText,
+        passwordEditText: EditText,
+        numberEditText: EditText,
+        balanceEditText: EditText
+    ): HashMap<String, String> {
+        return hashMapOf(
+            "username" to nameEditText.text.toString(),
+            "email" to emailEditText.text.toString(),
+            "password" to passwordEditText.text.toString(),
+            "number" to numberEditText.text.toString(),
+            "balance" to balanceEditText.text.toString()
+        )
+    }
+
+    private fun registerUser(userMap: HashMap<String, String>) {
+        val registerUserCall = apiService.registerUser(userMap)
+
+        registerUserCall.enqueue(object : Callback<RegisterUserResponse> {
+            override fun onResponse(
+                call: Call<RegisterUserResponse>,
+                response: Response<RegisterUserResponse>
+            ) {
+                handleRegisterUserResponse(response)
+            }
+
+            override fun onFailure(call: Call<RegisterUserResponse>, t: Throwable) {
+                Toast.makeText(this@Signup, t.message, Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun handleRegisterUserResponse(response: Response<RegisterUserResponse>) {
+        Log.d("API Response", "$response")
+
+        if (response.isSuccessful) {
+            val registerUserResponse = response.body()
+            if (registerUserResponse != null) {
+                val userName = registerUserResponse.name
+                Toast.makeText(this, "Signed up successfully", Toast.LENGTH_SHORT).show()
+                navigateToHome(userName)
+            } else if (response.code() == 404) {
+                Toast.makeText(this, "ALREADY REGISTERED", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, "Signup failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun navigateToHome(userName: String) {
+        val intent = Intent(this, HomeActivityPage::class.java)
+        intent.putExtra("user_name", userName)
+        startActivity(intent)
     }
 }

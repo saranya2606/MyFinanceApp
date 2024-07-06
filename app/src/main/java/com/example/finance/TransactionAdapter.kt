@@ -25,6 +25,7 @@ class TransactionAdapter(private val transactions: List<Transactions>,private va
     RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
     private val apiService: Retrofit1 by lazy {
         RetrofitClient.apiService
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -56,7 +57,7 @@ class TransactionAdapter(private val transactions: List<Transactions>,private va
         holder.textViewAmount.text = transactionr.amount.toString()
         holder.buttonSettle.setOnClickListener {
             onSettleTransaction(transactionr, TransactionAdapter(transactions,context),position)
-            // Handle the "Settle" button click here
+
         }
     }
     private fun onSettleTransaction(transaction: Transactions, adapter: TransactionAdapter, position: Int) {
@@ -72,29 +73,25 @@ class TransactionAdapter(private val transactions: List<Transactions>,private va
                     Log.d("transaction_reponse","$settleResponse")
                     if (settleResponse != null) {
                         isSettled=true
-                        // Transaction settled successfully, update the UI as needed
-                        // For example, disable the "Settle" button and show a success message
 
                         adapter.notifyItemChanged(position)
                         Toast.makeText(
-                            context, // Replace with your activity reference
+                            context,
                             "Transaction settled successfully",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        // Handle null response
-                        // Show an error message to the user
+
                         Toast.makeText(
-                            context, // Replace with your activity reference
+                            context,
                             "Failed to settle transaction",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 } else {
-                    // Handle API error or failure to settle the transaction
-                    // Show an error message to the user
+
                     Toast.makeText(
-                        context, // Replace with your activity reference
+                        context,
                         "Failed to settle transaction",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -102,10 +99,9 @@ class TransactionAdapter(private val transactions: List<Transactions>,private va
             }
 
             override fun onFailure(call: Call<SettleResponse>, t: Throwable) {
-                // Handle network or server error
-                // Show an error message to the user
+
                 Toast.makeText(
-                    context, // Replace with your activity reference
+                    context,
                     "Failed to settle transaction",
                     Toast.LENGTH_SHORT
                 ).show()

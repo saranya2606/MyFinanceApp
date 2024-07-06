@@ -58,7 +58,7 @@ class SplitAdapter(private val splits: List<Split>) :
         holder.textViewAmount.text = "${split.amount} rupees"
 
         holder.settleButton.setOnClickListener {
-            onSettleButtonClick(split, SplitAdapter(splits))
+            //onSettleButtonClick(split, SplitAdapter(splits))
 
         }
 
@@ -78,7 +78,7 @@ class SplitAdapter(private val splits: List<Split>) :
         Log.d("check_splitbutton", "hey")
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                onSettleSplit(split, adapter)
+                //onSettleSplit(split, adapter)
             } catch (e: Exception) {
                 // Handle the exception here if needed
             }
@@ -120,7 +120,7 @@ class SplitAdapter(private val splits: List<Split>) :
 
         val call = apiService.settleSplit(transaction.id)
 
-        call.enqueue(object : Callback<SettleResponse> {
+        /*call.enqueue(object : Callback<SettleResponse> {
             override fun onResponse(call: Call<SettleResponse>, response: Response<SettleResponse>) {
                 if (response.isSuccessful) {
                     val settleResponse = response.body()
@@ -165,7 +165,7 @@ class SplitAdapter(private val splits: List<Split>) :
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        })
+        })*/
     }
 
 

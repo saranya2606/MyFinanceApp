@@ -6,5 +6,5 @@ data class Transactions(
     val toUsernumber: String,
     val amount: Double,
 
-    // Other properties as needed...
+
 )

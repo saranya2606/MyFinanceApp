@@ -35,7 +35,7 @@ class TransactionsActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this@TransactionsActivity)
 
-        // Fetch the transactions from the API using Retrofit
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val transactions = apiService.getTransactions()
@@ -56,11 +56,10 @@ class TransactionsActivity : AppCompatActivity() {
 
 
                     recyclerView.adapter = transactionAdapter
-                    // Display the transactions in a RecyclerView
-                    //showTransactions(transactions)
+
                 }
             } catch (e: Exception) {
-                // Handle API call failure
+
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         this@TransactionsActivity,
